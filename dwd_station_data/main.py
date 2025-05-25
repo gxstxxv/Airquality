@@ -1,9 +1,10 @@
 from wetterdienst.provider.dwd.observation import DwdObservationRequest
 from wetterdienst import Settings
 import csv
+from datetime import datetime
+import os
 
 station_meta_data = "../dwd_station_meta_data/data/station_meta_data.csv"
-# station_meta_data = "../dwd_station_meta_data/data/station_meta_data_head.csv"
 
 station_meta = {}
 
@@ -32,41 +33,56 @@ parameters = [
     ("hourly", "wind", "wind_speed"),
 ]
 
-request = DwdObservationRequest(
-    parameters=parameters,
-    # start_date="2016-01-01",
-    # end_date="2025-05-12",
-    start_date="2025-01-01",
-    end_date="2025-02-01",
-    settings=settings,
-)
+start_year = 2017
+end_year = 2025
 
-stations = request.filter_by_station_id(station_id=station_ids)
+for year in range(start_year, end_year):
+    for month in range(1, 13):
+        start_date = datetime(year, month, 1)
+        if month == 12:
+            end_date = datetime(year + 1, 1, 1)
+        else:
+            end_date = datetime(year, month + 1, 1)
 
-output_file = "wetterdaten.csv"
+        output_file = f"data/wetterdaten_{start_date.date()
+                                          }_{end_date.date()}.csv"
 
-with open(output_file, "w", encoding="utf-8", newline="") as f:
-    first = True
-
-    for result in stations.values.query():
-        csv_str = result.to_csv()
-
-        lines = [line.strip() for line in csv_str.splitlines() if line.strip()]
-        if len(lines) < 2:
+        if os.path.exists(output_file):
             continue
 
-        print(f"{lines[1][:5]}")
+        print(f"{start_date.date()} bis {end_date.date()}")
 
-        station_id = lines[1].split(",")[0]
-        latitude, longitude = station_meta.get(station_id, ("", ""))
+        request = DwdObservationRequest(
+            parameters=parameters,
+            start_date=start_date.date().isoformat(),
+            end_date=end_date.date().isoformat(),
+            settings=settings,
+        )
 
-        if first:
-            header_line = lines[0] + ",latitude,longitude"
-            f.write(header_line)
-            first = False
+        stations = request.filter_by_station_id(station_id=station_ids)
 
-        for line in lines[1:]:
-            f.write("\n" + line + f",{latitude},{longitude}")
+        with open(output_file, "w", encoding="utf-8", newline="") as f:
+            first = True
 
+            for result in stations.values.query():
+                csv_str = result.to_csv()
 
-print(f"CSV-Datei '{output_file}' wurde erfolgreich erstellt.")
+                lines = [line.strip()
+                         for line in csv_str.splitlines() if line.strip()]
+                if len(lines) < 2:
+                    continue
+
+                station_id = lines[1].split(",")[0]
+                latitude, longitude = station_meta.get(station_id, ("", ""))
+
+                print(station_id)
+
+                if first:
+                    header_line = lines[0] + ",latitude,longitude"
+                    f.write(header_line)
+                    first = False
+
+                for line in lines[1:]:
+                    f.write("\n" + line + f",{latitude},{longitude}")
+
+        print(f"CSV-Datei '{output_file}' wurde erfolgreich erstellt.")
