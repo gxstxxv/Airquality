@@ -46,8 +46,8 @@ meta = get_metadata()
 
 def get_airquality_data(station_id: int):
     res = requests.get(f"{BASE_URL}/{AIRQUALITY_ENDPOINT}/json",
-                       params={"date_from": "2016-01-01",
-                               "date_to": "2016-01-02",
+                       params={"date_from": "2024-01-01",
+                               "date_to": "2025-01-01",
                                "time_from": "0",
                                "time_to": "0",
                                "station": station_id
