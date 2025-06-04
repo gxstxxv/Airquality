@@ -4,3 +4,6 @@ numpy
 shapely
 matplotlib
 scipy
+scikit-learn
+cartopy
+networkx
