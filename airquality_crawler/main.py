@@ -4,7 +4,9 @@ import csv
 BASE_URL = "https://www.umweltbundesamt.de/api/air_data/v3"
 AIRQUALITY_ENDPOINT = "airquality"
 META_ENDPOINT = "meta"
-OUTPUT_FILENAME = "airquality_.csv"
+DATE_FROM = "2024-01-01"
+DATE_TO = "2025-01-01"
+OUTPUT_FILENAME = f"airquality_{DATE_FROM}_{DATE_TO}.csv"
 
 # Define CSV headers
 headers = [
@@ -32,8 +34,8 @@ def get_metadata():
     res = requests.get(f"{BASE_URL}/{META_ENDPOINT}/json",
                        params={"use": "airquality",
                                "lang": "de",
-                               "date_from": "2019-01-01",
-                               "date_to": "2019-01-01",
+                               "date_from": DATE_FROM,
+                               "date_to": DATE_TO,
                                "time_from": "0",
                                "time_to": "0"
                                })
@@ -46,16 +48,14 @@ meta = get_metadata()
 
 def get_airquality_data(station_id: int):
     res = requests.get(f"{BASE_URL}/{AIRQUALITY_ENDPOINT}/json",
-                       params={"date_from": "2024-01-01",
-                               "date_to": "2025-01-01",
+                       params={"date_from": DATE_FROM,
+                               "date_to": DATE_TO,
                                "time_from": "0",
                                "time_to": "0",
                                "station": station_id
                                })
     res.raise_for_status()
     return res.json()
-
-# Create safe dictionary mappings
 
 
 def safe_get(lst, idx):
@@ -80,7 +80,6 @@ def map_data(airquality_data, metadata):
             "Station Postcode": safe_get(station_info, 19),
             "Station Longitude": safe_get(station_info, 7),
             "Station Latitude": safe_get(station_info, 8),
-            # or 15 for the shorter term
             "Urbanization Type": safe_get(station_info, 14)
         }
         for station_id, station_info in stations_mapping.items()
@@ -124,7 +123,10 @@ def map_data(airquality_data, metadata):
                 "Airquality index (All components)": airquality_index_all,
                 "Data incomplete": data_incomplete,
                 "Component ID": component_id,
-                "Component Name": id_to_component_name.get(component_id, f"Unknown-{component_id}"),
+                "Component Name": id_to_component_name.get(
+                    component_id,
+                    f"Unknown-{component_id}",
+                ),
                 "Value": value,
                 "Airquality index (Component)": component_index,
                 "Decimal Airquality index (Component)": decimal_index
@@ -151,8 +153,6 @@ def write_to_csv(mapped_data):
 
 init_csv()
 try:
-    # Loop and append data to CSV
-    print(len(list(meta["stations"])))
     for key in list(meta["stations"]):
         airquality_response = get_airquality_data(key)
         mapped_data = map_data(airquality_response, meta)
