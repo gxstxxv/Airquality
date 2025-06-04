@@ -37,9 +37,15 @@ for path in paths:
             i += 1
 
 
-attr = "Stations_id;von_datum;bis_datum;Stationshoehe;geoBreite;geoLaenge;Stationsname Bundesland;Abgabe\n"
+attr = "Stations_id;von_datum;bis_datum;Stationshoehe;" + \
+    "geoBreite;geoLaenge;Stationsname Bundesland;Abgabe\n"
 
-with open("data/station_meta_data.csv", "w", encoding="latin1", newline="") as outfile:
+with open(
+    "data/station_meta_data.csv",
+    "w",
+    encoding="latin1",
+    newline="",
+) as outfile:
     _ = outfile.write(attr)
     for line in sorted(lines.values()):
         _ = outfile.write(line + "\n")
