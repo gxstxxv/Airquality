@@ -44,8 +44,8 @@ for year in range(start_year, end_year):
         else:
             end_date = datetime(year, month + 1, 1)
 
-        output_file = f"data/wetterdaten_{start_date.date()
-                                          }_{end_date.date()}.csv"
+        output_file = f"data/weather_{start_date.date()
+                                      }_{end_date.date()}.csv"
 
         if os.path.exists(output_file):
             continue
