@@ -121,3 +121,4 @@ merge_airquality_weather/analysis/frames/prec_station_coordinates.csv
 merge_airquality_weather/analysis/plots/README.md
 merge_airquality_weather/preparation/data/airquality_2024-01-01_2025-01-01.csv
 merge_airquality_weather/preparation/data/weather_2024-01-01_2025-01-01.csv
+merge_airquality_weather/preparation/README.md
