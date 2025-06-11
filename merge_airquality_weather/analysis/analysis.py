@@ -216,7 +216,7 @@ def filter_coords_by_prec_index(prec_coords, pm2_coords):
 
 def save_data_frame(data, path):
     try:
-        data.to_csv("output_frames/"+path, index=False)
+        data.to_csv("frames/"+path, index=False)
         print(f"[INFO] created {path}")
     except Exception as e:
         print(f"[ERROR] {e}")
@@ -311,7 +311,7 @@ prec_indices = get_all_unique_indices(daily_combined)
 
 daily_all = get_aggregation_all_indices(daily_combined)
 
-station_id = 728
+station_id = 644
 filtered_daily_combined = get_daily_combined_of(station_id, daily_combined)
 
 display_combined_daily_data(
