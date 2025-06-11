@@ -1,3 +1,4 @@
 wetterdienst
+pandas
 utm
 scipy
