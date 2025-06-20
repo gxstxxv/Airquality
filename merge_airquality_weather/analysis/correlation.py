@@ -7,48 +7,40 @@ df = pd.read_csv('./frames/daily_mean_pm2_and_sum_prec.csv')
 
 pearson_corr, pearson_p = pearsonr(
     df['daily_mean_pm25'], df['daily_total_prec'])
-
 spearman_corr, spearman_p = spearmanr(
     df['daily_mean_pm25'], df['daily_total_prec'])
 
 print(f"Pearson-Korrelation: {pearson_corr:.3f} (p-Wert: {pearson_p:.3f})")
 print(f"Spearman-Korrelation: {spearman_corr:.3f} (p-Wert: {spearman_p:.3f})")
 
-# Pearson-Korrelation: -0.145 (p-Wert: 0.000)
-# Spearman-Korrelation: -0.246 (p-Wert: 0.000)
+df['pm25_cat'] = pd.cut(df['daily_mean_pm25'],
+                        bins=[0, 5, 15, float('inf')],
+                        labels=['gut (≤5)', 'mäßig (5-15)', 'schlecht (>15)'])
 
 df['prec_cat'] = pd.cut(df['daily_total_prec'],
-                        bins=[0, 0.1, 1, 5, 10, float('inf')],
-                        labels=[
-                        '0.0',
-                        '0.1-1.0',
-                        '1.0-5.0',
-                        '5.0-10.0',
-                        '>10.0',
-                        ])
-
-df['pm25_cat'] = pd.cut(df['daily_mean_pm25'],
-                        bins=5,
-                        labels=[
-                        'very low',
-                        'low',
-                        'medium',
-                        'high',
-                        'very high',
-                        ]
-                        )
-
-# PM₂.₅-Categories: very low: 0.0-12.9 µg/m³, low: 12.9-25.8 µg/m³,
-# medium: 25.8-38.7 µg/m³, high: 38.7-51.6 µg/m³, very high: 51.6-64.5 µg/m³
+                        bins=[0, 0.1, 7, float('inf')],
+                        labels=['trocken (0)', 'mäßig (0.1-7)', 'stark (>7)'])
 
 contingency_table = pd.crosstab(df['pm25_cat'], df['prec_cat'])
+print("\nKreuztabelle:")
+print(contingency_table)
 
-plt.figure(figsize=(10, 6))
-sns.heatmap(contingency_table, annot=True, fmt='d', cmap='Blues')
-plt.title('Heatmap: Relationship between PM2.5' +
-          ' Categories and Precipitation Categories')
-plt.ylabel('PM₂.₅')
-plt.xlabel('Precipitation (mm)')
+plt.figure(figsize=(8, 6))
+sns.heatmap(contingency_table, annot=True, fmt='d', cmap='YlOrRd',
+            cbar_kws={'label': 'Anzahl Tage'})
+plt.title('PM2.5 vs. Niederschlag\n(WHO-Kategorien)')
+plt.ylabel('PM₂.₅ Kategorien (µg/m³)')
+plt.xlabel('Niederschlag Kategorien (mm/Tag)')
+plt.tight_layout()
+plt.show()
 
+plt.figure(figsize=(8, 6))
+contingency_pct = contingency_table.div(
+    contingency_table.sum(axis=1), axis=0) * 100
+sns.heatmap(contingency_pct, annot=True, fmt='.1f', cmap='YlOrRd',
+            cbar_kws={'label': 'Prozent innerhalb PM2.5-Kategorie'})
+plt.title('PM2.5 vs. Niederschlag (Prozentuale Verteilung)\n(WHO-Kategorien)')
+plt.ylabel('PM₂.₅ Kategorien (µg/m³)')
+plt.xlabel('Niederschlag Kategorien (mm/Tag)')
 plt.tight_layout()
 plt.show()

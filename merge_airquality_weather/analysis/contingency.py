@@ -5,12 +5,13 @@ import numpy as np
 df = pd.read_csv('./frames/daily_mean_pm2_and_sum_prec.csv')
 
 df['pm25_category'] = pd.cut(df['daily_mean_pm25'],
-                             bins=3,
-                             labels=['niedrig', 'mittel', 'hoch'])
+                             bins=[0, 5, 15, float('inf')],
+                             labels=['gut', 'mäßig', 'schlecht'])
 
 df['prec_category'] = pd.cut(df['daily_total_prec'],
-                             bins=[0, 0.1, 5, float('inf')],
-                             labels=['trocken', 'leicht', 'stark'])
+                             bins=[0, 0.1, 7, float('inf')],
+                             labels=['trocken', 'mäßig', 'stark'])
+
 
 crosstab = pd.crosstab(df['pm25_category'], df['prec_category'])
 print(crosstab)
