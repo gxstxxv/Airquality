@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels.graphics.mosaicplot import mosaic
 from scipy.stats import chi2_contingency
 import pandas as pd
 import numpy as np
@@ -26,3 +29,19 @@ corrected_contingency_coeff = contingency_coeff / \
 print(f"Chi-Quadrat: {chi2:.3f} (p-Wert: {p_value:.3f})")
 print(f"Kontingenzkoeffizient: {contingency_coeff:.3f}")
 print(f"Korrigierter Kontingenzkoeffizient: {corrected_contingency_coeff:.3f}")
+
+
+plt.figure(figsize=(8, 6))
+mosaic(df, ['prec_category', 'pm25_category'],
+       title='Mosaikplot: PM2.5 vs. Niederschlag')
+plt.show()
+
+residuals = (crosstab - expected) / np.sqrt(expected)
+
+plt.figure(figsize=(6, 5))
+sns.heatmap(residuals, annot=True, cmap="coolwarm", center=0, fmt=".2f")
+plt.title('Standardisierte Residuen (Beobachtet - Erwartet)')
+plt.xlabel("Niederschlags-Kategorie")
+plt.ylabel("PM2.5-Kategorie")
+plt.tight_layout()
+plt.show()

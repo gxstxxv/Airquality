@@ -8,3 +8,4 @@ scikit-learn
 cartopy
 networkx
 seaborn
+statsmodels
